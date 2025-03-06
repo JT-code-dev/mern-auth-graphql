@@ -1,21 +1,50 @@
 import express from 'express';
-import path from 'node:path';
-import db from './config/connection.js';
-import routes from './routes/index.js';
+import { ApolloServer } from 'apollo-server-express';
+import mongoose from 'mongoose';
+import path from 'path';
+import cors from 'cors';
+import { typeDefs } from './schemas/typeDefs.js';
+import { resolvers } from './schemas/resolvers.js';
+import authMiddleware from './services/auth.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-
-app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 app.use(express.json());
 
-// if we're in production, serve client/build as static assets
+// Static file serving for production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
+    app.use(express.static(path.join(__dirname, '../client/build')));
+
+    app.get('*', (_req, res) => {
+        res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    });
 }
 
-app.use(routes);
-
-db.once('open', () => {
-  app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}`));
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => authMiddleware({ req }),
 });
+
+async function startServer() {
+    console.log('🚀 Starting Apollo Server...');
+    await server.start();
+    server.applyMiddleware({ app });
+
+    mongoose.connect(process.env.MONGODB_URI!)
+        .then(() => console.log('📚 Connected to MongoDB'));
+
+    const PORT = process.env.PORT || 4000;
+    app.listen(PORT, () => {
+        console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`);
+    });
+
+    app.use((_req, res) => {
+        res.status(404).send('Not Found - Try /graphql');
+    });
+}
+
+startServer();
