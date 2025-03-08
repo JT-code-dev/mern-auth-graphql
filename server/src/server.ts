@@ -4,9 +4,9 @@ import { expressMiddleware } from '@apollo/server/express4';
 import mongoose from 'mongoose';
 import path from 'path';
 import cors from 'cors';
-import typeDefs from './schemas/typeDefs';
-import resolvers from './schemas/resolvers';
-import { authenticateToken } from './services/auth'; 
+import typeDefs from './schemas/typeDefs.js';
+import resolvers from './schemas/resolvers.js';
+import { authenticateToken } from './services/auth.js'; 
 import dotenv from 'dotenv';
 
 dotenv.config();
