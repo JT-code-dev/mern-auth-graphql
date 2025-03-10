@@ -1,9 +1,8 @@
-//gql is graphql and these are the queries from apollo
 import { gql } from '@apollo/client';
 
-// Mutation to log in a user
+// Mutation for user login
 export const LOGIN_USER = gql`
-  mutation login($email: String!, $password: String!) {
+  mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       token
       user {
@@ -14,9 +13,9 @@ export const LOGIN_USER = gql`
   }
 `;
 
-// Mutation to add (sign up) a new user
+// Mutation for user signup
 export const ADD_USER = gql`
-  mutation addUser($username: String!, $email: String!, $password: String!) {
+  mutation AddUser($username: String!, $email: String!, $password: String!) {
     addUser(username: $username, email: $email, password: $password) {
       token
       user {
@@ -27,17 +26,17 @@ export const ADD_USER = gql`
   }
 `;
 
-// Mutation to save a book to a user’s account
+// Mutation to save a book
 export const SAVE_BOOK = gql`
-  mutation saveBook($book: BookInput!) {
+  mutation SaveBook($book: BookInput!) {
     saveBook(book: $book) {
       _id
       username
       email
       savedBooks {
         bookId
-        title
         authors
+        title
         description
         image
         link
@@ -46,16 +45,19 @@ export const SAVE_BOOK = gql`
   }
 `;
 
-// Mutation to remove a book from saved books
+// Mutation to remove a book
 export const REMOVE_BOOK = gql`
-  mutation removeBook($bookId: String!) {
+  mutation RemoveBook($bookId: String!) {
     removeBook(bookId: $bookId) {
       _id
       username
-      email
       savedBooks {
         bookId
+        authors
         title
+        description
+        image
+        link
       }
     }
   }

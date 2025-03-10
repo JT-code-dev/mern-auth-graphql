@@ -17,28 +17,49 @@ const resolvers = {
         },
     },
     Mutation: {
-        login: async (
-            _parent: unknown,
-            { email, password }: { email: string; password: string }
-        ): Promise<{ token: string; user: UserDocument }> => {
+        login: async (_parent: unknown, { email, password }: { email: string; password: string }): Promise<{ token: string; user: UserDocument }> => {
+            console.log("🔍 Received login request for email:", email);
+        
             const user = await User.findOne({ email }).exec();
-            if (!user || !(await user.isCorrectPassword(password))) {
-                throw new GraphQLError(
-                    'Oops! Incorrect username or password. . .please try again!',
-                    { extensions: { code: 'UNAUTHENTICATED' } }
-                );
+            console.log("👤 Found user in database:", user);
+        
+            if (!user) {
+                console.log("❌ User not found.");
+                throw new GraphQLError('Oops! Incorrect username or password. . .please try again!', {
+                    extensions: { code: 'UNAUTHENTICATED' }
+                });
             }
-            const token = signToken(user);
+        
+            const isPasswordValid = await user.isCorrectPassword(password);
+            console.log("🔑 Password check result:", isPasswordValid);
+        
+            if (!isPasswordValid) {
+                console.log("❌ Incorrect password.");
+                throw new GraphQLError('Oops! Incorrect username or password. . .please try again!', {
+                    extensions: { code: 'UNAUTHENTICATED' }
+                });
+            }
+        
+            const token = signToken(user.toObject());
+            console.log("✅ Login successful, generated token:", token);
+        
             return { token, user };
-        },
+        }, // ✅ Added missing comma here
+
         addUser: async (
             _parent: unknown,
             { username, email, password }: { username: string; email: string; password: string }
         ): Promise<{ token: string; user: UserDocument }> => {
+            console.log("📝 Creating new user:", username, email);
             const user = await User.create({ username, email, password });
-            const token = signToken(user);
+
+            // ✅ Convert Mongoose document to plain object before signing the token
+            const token = signToken(user.toObject());
+            console.log("✅ User created successfully with token:", token);
+
             return { token, user };
         },
+
         saveBook: async (
             _parent: unknown,
             { book }: { book: any },
@@ -49,12 +70,14 @@ const resolvers = {
                     extensions: { code: 'UNAUTHENTICATED' }
                 });
             }
+
             return await User.findByIdAndUpdate(
                 context.user._id,
                 { $addToSet: { savedBooks: book } },
                 { new: true, runValidators: true }
             ).exec();
         },
+
         removeBook: async (
             _parent: unknown,
             { bookId }: { bookId: string },
@@ -65,6 +88,7 @@ const resolvers = {
                     extensions: { code: 'UNAUTHENTICATED' }
                 });
             }
+
             return await User.findByIdAndUpdate(
                 context.user._id,
                 { $pull: { savedBooks: { bookId } } },
