@@ -5,7 +5,7 @@ import { useMutation } from '@apollo/client';
 import { ADD_USER } from '../utils/mutations';
 import { setToken } from '../utils/auth';
 
-const SignupForm = ({ handleModalClose }: { handleModalClose?: () => void }) => {
+const SignupForm = () => {
   // Set initial form state
   const [userFormData, setUserFormData] = useState({ username: '', email: '', password: '' });
   const [showAlert, setShowAlert] = useState(false);
@@ -34,7 +34,6 @@ const SignupForm = ({ handleModalClose }: { handleModalClose?: () => void }) => 
 
       if (data?.addUser?.token) {
         setToken(data.addUser.token); // Save token
-        handleModalClose?.(); // Close modal on success (if provided)
       }
     } catch (err) {
       console.error(err);
@@ -56,41 +55,48 @@ const SignupForm = ({ handleModalClose }: { handleModalClose?: () => void }) => 
           {error ? error.message : 'Something went wrong with your signup!'}
         </Alert>
 
-        <Form.Group className='mb-3'>
-          <Form.Label htmlFor='username'>Username</Form.Label>
-          <Form.Control
-            type='text'
-            placeholder='Your username'
-            name='username'
-            onChange={handleInputChange}
-            value={userFormData.username}
-            required
-          />
-        </Form.Group>
+        <Form.Group className="mb-3">
+  <Form.Label htmlFor="username">Username</Form.Label>
+  <Form.Control
+    id="username" // Add ID
+    type="text"
+    placeholder="Your username"
+    name="username"
+    autoComplete="off" // Add this
+    onChange={handleInputChange}
+    value={userFormData.username}
+    required
+  />
+</Form.Group>
 
-        <Form.Group className='mb-3'>
-          <Form.Label htmlFor='email'>Email</Form.Label>
-          <Form.Control
-            type='email'
-            placeholder='Your email address'
-            name='email'
-            onChange={handleInputChange}
-            value={userFormData.email}
-            required
-          />
-        </Form.Group>
+<Form.Group className="mb-3">
+  <Form.Label htmlFor="email">Email</Form.Label>
+  <Form.Control
+    id="email" // Add ID
+    type="email"
+    placeholder="Your email address"
+    name="email"
+    autoComplete="off" // 
+    onChange={handleInputChange}
+    value={userFormData.email}
+    required
+  />
+</Form.Group>
 
-        <Form.Group className='mb-3'>
-          <Form.Label htmlFor='password'>Password</Form.Label>
-          <Form.Control
-            type='password'
-            placeholder='Your password'
-            name='password'
-            onChange={handleInputChange}
-            value={userFormData.password}
-            required
-          />
-        </Form.Group>
+<Form.Group className="mb-3">
+  <Form.Label htmlFor="password">Password</Form.Label>
+  <Form.Control
+    id="password" // Add ID
+    type="password"
+    placeholder="Your password"
+    name="password"
+    autoComplete="off" 
+    onChange={handleInputChange}
+    value={userFormData.password}
+    required
+  />
+</Form.Group>
+
         
         <Button
           disabled={!(userFormData.username && userFormData.email && userFormData.password)}
@@ -104,4 +110,3 @@ const SignupForm = ({ handleModalClose }: { handleModalClose?: () => void }) => 
 };
 
 export default SignupForm;
-

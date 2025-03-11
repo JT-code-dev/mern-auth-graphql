@@ -8,15 +8,30 @@ import { getToken } from '../utils/auth';
 const SavedBooks = () => {
   // Fetch user data with Apollo's useQuery hook
   const { loading, data } = useQuery(GET_ME);
-  const userData = data?.me || { savedBooks: [] };
+  const userData = data?.me ?? { username: '', savedBooks: [] }; // ✅ Fixed fallback
 
   // Set up the removeBook mutation
-  const [removeBook] = useMutation(REMOVE_BOOK);
+  const [removeBook] = useMutation(REMOVE_BOOK, {
+    update(cache, { data }) {
+      if (data?.removeBook) {
+        cache.writeQuery({
+          query: GET_ME,
+          data: {
+            me: {
+              ...userData,
+              savedBooks: userData.savedBooks.filter((book) => book.bookId !== data.removeBook.bookId),
+            },
+          },
+        });
+      }
+    },
+  });
 
   // Function to handle deleting a book
   const handleDeleteBook = async (bookId: string) => {
     const token = getToken();
     if (!token) {
+      console.error("⚠️ No token found! User must be logged in.");
       return false;
     }
 
@@ -26,10 +41,11 @@ const SavedBooks = () => {
       });
 
       if (data?.removeBook) {
-        removeBookId(bookId); // Remove from localStorage
+        removeBookId(bookId); // ✅ Remove from localStorage
+        console.log(`✅ Successfully removed book with ID: ${bookId}`);
       }
     } catch (err) {
-      console.error(err);
+      console.error("❌ Error deleting book:", err);
     }
   };
 
@@ -73,3 +89,4 @@ const SavedBooks = () => {
 };
 
 export default SavedBooks;
+

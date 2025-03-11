@@ -15,8 +15,7 @@ import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../models/GoogleAPIBook';
 import { useMutation } from '@apollo/client';
 import { SAVE_BOOK } from '../utils/mutations';
-import searchGoogleBooks from "../utils/searchGoogleBooks.ts"; // Correct import - but why does it need .ts?
-
+import searchGoogleBooks from "../utils/searchGoogleBooks"; 
 
 const SearchBooks = () => {
   const [searchedBooks, setSearchedBooks] = useState<Book[]>([]);
@@ -32,26 +31,30 @@ const SearchBooks = () => {
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!searchInput) return false;
+    if (!searchInput) return false; // to prevents empty searches
 
     try {
-      const response = await searchGoogleBooks(searchInput);
-      if (!response.ok) throw new Error('Something went wrong!');
-      
-      const { items } = await response.json();
-      const bookData = items.map((book: GoogleAPIBook) => ({
+      const data = await searchGoogleBooks(searchInput); 
+      console.log("📚 API Response:", data); //  Debugging step
+
+      if (!data.items) {
+        console.warn('⚠️ No books found!');
+        return;
+      }
+
+      const bookData = data.items.map((book: GoogleAPIBook) => ({
         bookId: book.id,
         authors: book.volumeInfo.authors || ['No author to display'],
         title: book.volumeInfo.title,
         description: book.volumeInfo.description,
         image: book.volumeInfo.imageLinks?.thumbnail || '',
-        link: book.volumeInfo.infoLink || '', // ✅ Added correctly
+        link: book.volumeInfo.infoLink || '',
       }));
 
-      setSearchedBooks(bookData);
-      setSearchInput('');
+      setSearchedBooks(bookData); // Save books in state
+      setSearchInput(''); // Reset input field
     } catch (err) {
-      console.error(err);
+      console.error("❌ Error fetching books:", err);
     }
   };
 
@@ -134,10 +137,9 @@ const SearchBooks = () => {
                       onClick={() => handleSaveBook(book.bookId)}>
                       {savedBookIds?.some((savedBookId: string) => savedBookId === book.bookId)
                         ? 'This book has already been saved!'
-                              : 'Save this Book!'}
+                        : 'Save this Book!'}
                     </Button>
-)}
-                
+                  )}
                 </Card.Body>
               </Card>
             </Col>

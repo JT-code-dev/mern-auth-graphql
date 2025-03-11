@@ -7,25 +7,20 @@ import { GET_ME } from '../utils/queries';
 
 const AppNavbar = () => {
   const navigate = useNavigate();
-
-  // Check if user is logged in using token
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(!!getToken());
 
-  // Apollo query to check user authentication
   const { data } = useQuery(GET_ME, {
-    skip: !getToken(), // Skip query if no token
+    skip: !getToken(),
   });
 
-  // Effect to update state when login status changes
   useEffect(() => {
     setIsLoggedIn(!!getToken());
-  }, [data, isLoggedIn]); // Updates when user logs in/out
+  }, [data, isLoggedIn]);
 
-  // Logout function
   const handleLogout = () => {
-    removeToken(); // Clear the token from storage
-    setIsLoggedIn(false); // Update state to refresh UI
-    navigate('/'); // Redirect to home
+    removeToken();
+    setIsLoggedIn(false);
+    navigate('/');
   };
 
   return (
@@ -42,7 +37,10 @@ const AppNavbar = () => {
                 <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
               </>
             ) : (
-              <Nav.Link as={Link} to="/login">Login/Sign Up</Nav.Link>
+              <>
+                <Nav.Link as={Link} to="/login">Login</Nav.Link>  {/* ✅ Separate Login */}
+                <Nav.Link as={Link} to="/signup">Sign Up</Nav.Link>  {/* ✅ New Sign-Up Link */}
+              </>
             )}
           </Nav>
         </Navbar.Collapse>
@@ -52,4 +50,3 @@ const AppNavbar = () => {
 };
 
 export default AppNavbar;
-
