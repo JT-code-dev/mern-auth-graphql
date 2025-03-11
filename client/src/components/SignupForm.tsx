@@ -5,10 +5,9 @@ import { useMutation } from '@apollo/client';
 import { ADD_USER } from '../utils/mutations';
 import { setToken } from '../utils/auth';
 
-const SignupForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
+const SignupForm = ({ handleModalClose }: { handleModalClose?: () => void }) => {
   // Set initial form state
   const [userFormData, setUserFormData] = useState({ username: '', email: '', password: '' });
-  const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
   // Apollo Mutation Hook for adding a user
@@ -35,7 +34,7 @@ const SignupForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
 
       if (data?.addUser?.token) {
         setToken(data.addUser.token); // Save token
-        handleModalClose(); // Close modal on success
+        handleModalClose?.(); // Close modal on success (if provided)
       }
     } catch (err) {
       console.error(err);
@@ -52,7 +51,7 @@ const SignupForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
 
   return (
     <>
-      <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
+      <Form noValidate onSubmit={handleFormSubmit}>
         <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert || !!error} variant='danger'>
           {error ? error.message : 'Something went wrong with your signup!'}
         </Alert>
@@ -67,7 +66,6 @@ const SignupForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
             value={userFormData.username}
             required
           />
-          <Form.Control.Feedback type='invalid'>Username is required!</Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className='mb-3'>
@@ -80,7 +78,6 @@ const SignupForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
             value={userFormData.email}
             required
           />
-          <Form.Control.Feedback type='invalid'>Email is required!</Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className='mb-3'>
@@ -93,14 +90,13 @@ const SignupForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
             value={userFormData.password}
             required
           />
-          <Form.Control.Feedback type='invalid'>Password is required!</Form.Control.Feedback>
         </Form.Group>
         
         <Button
           disabled={!(userFormData.username && userFormData.email && userFormData.password)}
           type='submit'
           variant='success'>
-          Submit
+          Sign Up
         </Button>
       </Form>
     </>
@@ -108,3 +104,4 @@ const SignupForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
 };
 
 export default SignupForm;
+
