@@ -12,7 +12,7 @@ import SignupForm from "./components/SignupForm";
 
 
 const httpLink = createHttpLink({
-  uri: 'http://localhost:4000/graphql', 
+  uri: import.meta.env.VITE_GRAPHQL_ENDPOINT || 'http://localhost:4000/graphql', 
 });
 
 const authLink = setContext((_, { headers }) => {

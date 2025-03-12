@@ -2,32 +2,23 @@ import express from 'express';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import mongoose from 'mongoose';
-import path from 'path';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
 import typeDefs from './schemas/typeDefs.js';
 import resolvers from './schemas/resolvers.js';
-import { authenticateToken } from './services/auth.js'; 
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
+import { authenticateToken } from './services/auth.js';
 
-// 🔧 Fix __dirname for ES Modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+// Load environment variables
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Static file serving for production
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../client/build')));
-    app.get('*', (_req, res) => {
-        res.sendFile(path.join(__dirname, '../client/build/index.html'));
-    });
-}
+// ✅ Removed Static File Serving - Frontend is hosted separately
 
+// Initialize Apollo Server
 const server = new ApolloServer({
     typeDefs,
     resolvers,
@@ -46,13 +37,18 @@ async function startServer() {
         })
     );
 
-    mongoose.connect(process.env.MONGODB_URI!)
-        .then(() => console.log('📚 Connected to MongoDB'));
+    try {
+        await mongoose.connect(process.env.MONGODB_URI!);
+        console.log('📚 Connected to MongoDB');
+    } catch (error) {
+        console.error('❌ MongoDB connection error:', error);
+    }
 
     const PORT = process.env.PORT || 4000;
     app.listen(PORT, () => {
-        console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
+        console.log(`🚀 Server ready at https://googlebooks-backend.onrender.com/graphql`);
     });
 }
 
+// Start the server
 startServer();

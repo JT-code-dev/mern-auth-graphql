@@ -7,8 +7,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "watch": "nodemon dist/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "tsc -w"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +15,6 @@
   "dependencies": {
     "@apollo/server": "^4.11.3",
     "bcrypt": "^4.0.1",
-    "brcypt": "^1.0.1",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "graphql": "^16.10.0",
@@ -33,7 +31,6 @@
     "@types/mongoose": "^5.11.96",
     "@types/node": "^20.17.23",
     "dotenv": "^16.4.5",
-    "nodemon": "^3.1.0",
     "typescript": "^5.4.5"
   }
 }
