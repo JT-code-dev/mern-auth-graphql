@@ -8,6 +8,11 @@ import typeDefs from './schemas/typeDefs.js';
 import resolvers from './schemas/resolvers.js';
 import { authenticateToken } from './services/auth.js'; 
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+
+// 🔧 Fix __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
