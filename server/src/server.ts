@@ -13,10 +13,18 @@ import { authenticateToken } from './services/auth.js';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// ✅ Configure CORS properly
+app.use(cors({
+  origin: ['https://mern-auth-graphql.onrender.com'], // ✅ Replace with your frontend Render URL
+  credentials: true, // ✅ Allow cookies & authentication headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // ✅ Allow required HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // ✅ Allow headers needed for GraphQL auth
+}));
+
 app.use(express.json());
 
-// ✅ Removed Static File Serving - Frontend is hosted separately
+// Removed Static File Serving - Frontend is hosted separately
 
 // Initialize Apollo Server
 const server = new ApolloServer({
